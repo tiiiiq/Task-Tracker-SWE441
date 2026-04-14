@@ -44,3 +44,29 @@ li {
     padding: 10px;
     border-radius: 4px;
 }
+/* تحسين مظهر قائمة المهام */
+#taskList li {
+    background: #ffffff;
+    border-right: 5px solid #28a745; /* تميز جانبي للمهمة */
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* ظل خفيف */
+    transition: transform 0.2s; /* تأثير عند التمرير */
+}
+
+#taskList li:hover {
+    transform: scale(1.02); /* تكبير بسيط عند التمرير */
+}
+
+#taskList li strong {
+    color: #333;
+    font-size: 1.1em;
+    display: block;
+    margin-bottom: 5px;
+}
+
+#taskList li span {
+    color: #666;
+    font-size: 0.9em;
+}
