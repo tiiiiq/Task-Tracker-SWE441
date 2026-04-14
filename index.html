@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متتبع المهام اليومية</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>المهام اليومية للفريق</h1>
+        
+        <div class="input-section">
+            <input type="text" id="taskName" placeholder="اسم المهمة (مثال: الذهاب للنادي)">
+            <input type="date" id="taskDate">
+            <input type="time" id="taskTime">
+            <button onclick="addTask()">إضافة المهمة</button>
+        </div>
+
+        <ul id="taskList">
+            </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
