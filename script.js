@@ -30,3 +30,33 @@ function addTask() {
     document.getElementById("taskDate").value = "";
     document.getElementById("taskTime").value = "";
 }
+document.getElementById("addTaskBtn").addEventListener("click", function() {
+    let name = document.getElementById("taskName").value;
+    let date = document.getElementById("taskDate").value;
+    let time = document.getElementById("taskTime").value;
+    let priority = document.getElementById("taskPriority").value; // سحب قيمة الأولوية
+
+    if (name.trim() === "") {
+        alert("خطأ: يجب إدخال اسم للمهمة!");
+        return;
+    }
+
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let selectedDate = new Date(date);
+
+    if (selectedDate < today) {
+        alert("خطأ: لا يمكن اختيار تاريخ في الماضي!");
+        return;
+    }
+
+    let taskList = document.getElementById("taskList");
+    let li = document.createElement("li");
+    // دمج الأولوية في شكل المهمة المضافة
+    li.innerHTML = <strong>${name}</strong> <span style="font-size: 0.8em; background: #eee; padding: 2px 5px; border-radius: 4px;">الأولوية: ${priority}</span> <br> <span>📅 ${date} | 🕒 ${time}</span>;
+    taskList.appendChild(li);
+
+    document.getElementById("taskName").value = "";
+    document.getElementById("taskDate").value = "";
+    document.getElementById("taskTime").value = "";
+});
