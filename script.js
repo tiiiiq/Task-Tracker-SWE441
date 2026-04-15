@@ -1,88 +1,132 @@
+// مصفوفة لتخزين المهام
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+// عند تحميل الصفحة
+window.onload = function() {
+    setDateConstraints();
+    renderTasks();
+};
+
+// 1. تقييد التاريخ (اليوم + 3 أيام فقط)
+function setDateConstraints() {
+    let dateInput = document.getElementById("taskDate");
+    let today = new Date();
+    let maxDate = new Date();
+    maxDate.setDate(today.getDate() + 3); // إضافة 3 أيام
+
+    // تنسيق التاريخ ليكون YYYY-MM-DD
+    let formattedToday = today.toISOString().split("T")[0];
+    let formattedMaxDate = maxDate.toISOString().split("T")[0];
+
+    dateInput.min = formattedToday;
+    dateInput.max = formattedMaxDate;
+    dateInput.value = formattedToday; // تعيين اليوم كقيمة افتراضية
+}
+
+// 2. إضافة مهمة جديدة
 function addTask() {
     let name = document.getElementById("taskName").value;
     let date = document.getElementById("taskDate").value;
-    let time = document.getElementById("taskTime").value;
+    let start = document.getElementById("startTime").value;
+    let end = document.getElementById("endTime").value;
 
-    // 1. حل مشكلة إضافة مهمة بدون اسم
+    // التحقق من المدخلات
     if (name.trim() === "") {
-        alert("خطأ: يجب إدخال اسم للمهمة!");
-        return; // يوقف الكود هنا وما يضيف شيء
+        alert("يرجى إدخال اسم المهمة!");
+        return;
+    }
+    if (start === "" || end === "") {
+        alert("يرجى تحديد وقت البداية والنهاية!");
+        return;
+    }
+    if (start >= end) {
+        alert("وقت النهاية يجب أن يكون بعد وقت البداية!");
+        return;
     }
 
-    // 2. حل مشكلة اختيار تاريخ قديم
-    let today = new Date();
-    today.setHours(0, 0, 0, 0); // تصفير الوقت عشان نقارن التاريخ بس
-    let selectedDate = new Date(date);
+    // إنشاء كائن المهمة
+    let newTask = {
+        id: Date.now(), // رقم تعريف فريد
+        name: name,
+        date: date,
+        start: start,
+        end: end,
+        completed: false
+    };
 
-    if (selectedDate < today) {
-        alert("خطأ: لا يمكن اختيار تاريخ في الماضي!");
-        return; // يوقف الكود هنا
-    }
+    tasks.push(newTask);
+    saveData();
+    renderTasks();
 
-    // الكود الطبيعي لإضافة المهمة إذا كل الشروط سليمة
-    let taskList = document.getElementById("taskList");
-    let li = document.createElement("li");
-    li.innerHTML = `<strong>${name}</strong> <br> <span>📅 ${date} | 🕒 ${time}</span>`;
-    taskList.appendChild(li);
-
-    // تفريغ الخانات بعد الإضافة
+    // تفريغ الحقول
     document.getElementById("taskName").value = "";
-    document.getElementById("taskDate").value = "";
-    document.getElementById("taskTime").value = "";
+    document.getElementById("startTime").value = "";
+    document.getElementById("endTime").value = "";
 }
-document.getElementById("addTaskBtn").addEventListener("click", function() {
-    let name = document.getElementById("taskName").value;
-    let date = document.getElementById("taskDate").value;
-    let time = document.getElementById("taskTime").value;
-    let priority = document.getElementById("taskPriority").value; // سحب قيمة الأولوية
 
-    if (name.trim() === "") {
-        alert("خطأ: يجب إدخال اسم للمهمة!");
-        return;
-    }
+// 3. عرض المهام في القوائم
+function renderTasks() {
+    let activeList = document.getElementById("activeTasks");
+    let completedList = document.getElementById("completedTasks");
 
-    let today = new Date();
-    today.setHours(0, 0, 0, 0);
-    let selectedDate = new Date(date);
+    activeList.innerHTML = "";
+    completedList.innerHTML = "";
 
-    if (selectedDate < today) {
-        alert("خطأ: لا يمكن اختيار تاريخ في الماضي!");
-        return;
-    }
-
-  
-// دالة مسح جميع المهام
-function clearAll() {
-    let taskList = document.getElementById("taskList");
-    if (taskList.innerHTML === "") {
-        alert("القائمة فارغة بالفعل!");
-    } else {
-        let confirmClear = confirm("هل أنت متأكد أنك تريد مسح جميع المهام؟");
-        if (confirmClear) {
-            taskList.innerHTML = "";
+    tasks.forEach(task => {
+        let li = document.createElement("li");
+        
+        if (!task.completed) {
+            // تصميم المهمة الحالية
+            li.className = "task-item";
+            li.innerHTML = `
+                <div class="task-info">
+                    <h3>${task.name}</h3>
+                    <div class="task-meta">
+                        <span>📅 ${task.date}</span>
+                        <span>🕒 ${task.start} - ${task.end}</span>
+                    </div>
+                </div>
+                <button class="complete-btn" onclick="completeTask(${task.id})">إنجاز ✔</button>
+            `;
+            activeList.appendChild(li);
+        } else {
+            // تصميم المهمة المنجزة
+            li.className = "task-item completed-task";
+            li.innerHTML = `
+                <div class="task-info">
+                    <h3>${task.name}</h3>
+                    <div class="task-meta">
+                        <span>🎉 أُنجزت بنجاح</span>
+                        <span>📅 ${task.date}</span>
+                    </div>
+                </div>
+                <button class="delete-btn" onclick="deleteTask(${task.id})">حذف 🗑</button>
+            `;
+            completedList.appendChild(li);
         }
+    });
+}
+
+// 4. تحويل المهمة إلى منجزة
+function completeTask(id) {
+    let task = tasks.find(t => t.id === id);
+    if (task) {
+        task.completed = true;
+        saveData();
+        renderTasks();
     }
 }
-/* تأثيرات حركية للأزرار عند تمرير الماوس /
-button {
-    transition: transform 0.3s ease, background-color 0.3s ease;
+
+// 5. حذف المهمة من السجل
+function deleteTask(id) {
+    if (confirm("هل أنت متأكد من حذف هذه المهمة نهائياً؟")) {
+        tasks = tasks.filter(t => t.id !== id);
+        saveData();
+        renderTasks();
+    }
 }
 
-button:hover {
-    transform: scale(1.08); / تكبير الزر بنسبة 8% */
-    cursor: pointer;
-    opacity: 0.9;
-
-    
+// 6. حفظ البيانات في المتصفح
+function saveData() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
 }
-
-  let taskList = document.getElementById("taskList");
-    let li = document.createElement("li");
-    // دمج الأولوية في شكل المهمة المضافة
-    li.innerHTML = <strong>${name}</strong> <span style="font-size: 0.8em; background: #eee; padding: 2px 5px; border-radius: 4px;">الأولوية: ${priority}</span> <br> <span>📅 ${date} | 🕒 ${time}</span>;
-    taskList.appendChild(li);
-
-    document.getElementById("taskName").value = "";
-    document.getElementById("taskDate").value = "";
-    document.getElementById("taskTime").value = "";
-});
