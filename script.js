@@ -50,7 +50,33 @@ document.getElementById("addTaskBtn").addEventListener("click", function() {
         return;
     }
 
+  
+// دالة مسح جميع المهام
+function clearAll() {
     let taskList = document.getElementById("taskList");
+    if (taskList.innerHTML === "") {
+        alert("القائمة فارغة بالفعل!");
+    } else {
+        let confirmClear = confirm("هل أنت متأكد أنك تريد مسح جميع المهام؟");
+        if (confirmClear) {
+            taskList.innerHTML = "";
+        }
+    }
+}
+/* تأثيرات حركية للأزرار عند تمرير الماوس /
+button {
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+button:hover {
+    transform: scale(1.08); / تكبير الزر بنسبة 8% */
+    cursor: pointer;
+    opacity: 0.9;
+
+    
+}
+
+  let taskList = document.getElementById("taskList");
     let li = document.createElement("li");
     // دمج الأولوية في شكل المهمة المضافة
     li.innerHTML = <strong>${name}</strong> <span style="font-size: 0.8em; background: #eee; padding: 2px 5px; border-radius: 4px;">الأولوية: ${priority}</span> <br> <span>📅 ${date} | 🕒 ${time}</span>;
