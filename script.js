@@ -3,29 +3,29 @@ function addTask() {
     let date = document.getElementById("taskDate").value;
     let time = document.getElementById("taskTime").value;
 
-    // الحصول على تاريخ اليوم بدون وقت للمقارنة
+    // 1. حل مشكلة إضافة مهمة بدون اسم
+    if (name.trim() === "") {
+        alert("خطأ: يجب إدخال اسم للمهمة!");
+        return; // يوقف الكود هنا وما يضيف شيء
+    }
+
+    // 2. حل مشكلة اختيار تاريخ قديم
     let today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0); // تصفير الوقت عشان نقارن التاريخ بس
     let selectedDate = new Date(date);
 
-    // التحقق من اسم المهمة
-    if (name.trim() === "") {
-        alert(" لا يمكن إضافة مهمة بدون اسم!");
-        return;
-    }
-
-    // التحقق من التاريخ (إصلاح الثغرة)
     if (selectedDate < today) {
-        alert(" لا يمكن اختيار تاريخ في الماضي!");
-        return;
+        alert("خطأ: لا يمكن اختيار تاريخ في الماضي!");
+        return; // يوقف الكود هنا
     }
 
+    // الكود الطبيعي لإضافة المهمة إذا كل الشروط سليمة
     let taskList = document.getElementById("taskList");
     let li = document.createElement("li");
     li.innerHTML = `<strong>${name}</strong> <br> <span>📅 ${date} | 🕒 ${time}</span>`;
     taskList.appendChild(li);
 
-    // تفريغ الحقول بعد الإضافة
+    // تفريغ الخانات بعد الإضافة
     document.getElementById("taskName").value = "";
     document.getElementById("taskDate").value = "";
     document.getElementById("taskTime").value = "";
